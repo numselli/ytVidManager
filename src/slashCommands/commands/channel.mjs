@@ -28,7 +28,7 @@ export default {
                 }).catch(() => {});
             break;
             case "list":
-                const list = client.db.prepare('SELECT channelid, channelname FROM channels').all().map(channel=>`- [${channel.channelname}](<https://www.youtube.com/channel/${channel.channelid}>) (channel.channelid)`).join("\n")
+                const list = client.db.prepare('SELECT channelid, channelname FROM channels').all().map(channel=>`- [${channel.channelname}](<https://www.youtube.com/channel/${channel.channelid}>) (${channel.channelid})`).join("\n")
                 client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
                     data: {
