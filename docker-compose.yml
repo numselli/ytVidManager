@@ -1,0 +1,13 @@
+version: "3"
+
+volumes:
+  ytVidManagerStatic:
+    external: true
+
+services:
+  ytvidmanager:
+    restart: unless-stopped
+    build: ./src
+    volumes:
+      - ytVidManagerStatic:/static
+    container_name: ytVidManager
