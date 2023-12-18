@@ -5,6 +5,9 @@ WORKDIR /app
 
 COPY . /app
 
+RUN apt -y update && \
+    apt -y install git
+
 RUN npm install
 
 CMD ["node", "cluster.mjs"]
