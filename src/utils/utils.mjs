@@ -59,5 +59,3 @@ export const postToDiscord = (disocrdChannel, client, lastRSS)=>{
         ]
     })
 }
-
-fetchFromRSS("UCsKVP_4zQ877TEiH_Ih5yDQ")

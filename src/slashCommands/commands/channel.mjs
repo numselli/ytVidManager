@@ -32,9 +32,21 @@ export default {
                 client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
                     data: {
-                        content: `# Youtube channels\n${list}`
+                        content: `# Youtube channels`
                     }
                 }).catch(() => {});
+
+                const perChunk = 10
+                list.split("\n").reduce((all,one,i) => {
+                    const ch = Math.floor(i/perChunk); 
+                    all[ch] = [].concat((all[ch]||[]),one); 
+                    return all
+                }, []).forEach(element => {
+                    client.rest.channels.createMessage(interaction.channelID, {
+                        content: element.join("\n")
+                    })
+                });
+            
             break;
         }
     },
