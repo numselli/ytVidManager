@@ -10,4 +10,4 @@ RUN apt -y update && \
 
 RUN npm install
 
-CMD ["node", "cluster.mjs"]
+CMD ["node", "index.mjs"]
