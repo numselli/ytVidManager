@@ -1,7 +1,11 @@
 import interactionsList from "../slashCommands/interactionsList.mjs";
 
+const { channelID } = await import(
+	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "../static/settings.mjs"
+);
+
 export default async (client, interaction) => {
-	if (client.channelID !== interaction.channel_id) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+	if (channelID !== interaction.channel_id) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
 		type: 4,
 		data: {
 			flags: 64,
