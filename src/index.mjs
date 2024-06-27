@@ -7,7 +7,7 @@ import commandList from "./slashCommands/commandList.mjs";
 
 import { postChannelYtVid } from "./utils/utils.mjs";
 
-const { token, cronSchedule } = await import(
+const { token, cronSchedule, guildID } = await import(
 	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "./static/settings.mjs"
 );
 
@@ -33,6 +33,7 @@ client.db = db
 client.on("error", console.log);
 client.on("interactionCreate", interactionCreate.bind(null, client))
 client.once("ready", async() => {
+	client.guildID = guildID
 	client.application.bulkEditGlobalCommands(commandList)
 
 	try {
