@@ -3,6 +3,14 @@ import { postToDiscord } from "../../utils/utils.mjs"
 export default {
     name: "add",
     commandLogic: async (interaction, client) => {
+        if (!interaction.data.options.raw[0].value.include("v=")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+            type: 4,
+            data: {
+                flags: 64,
+                content: `Video does not have a video id.`
+            }
+        }).catch(() => {});
+
         const vidID = interaction.data.options.raw[0].value.split("v=")[1].split("&")[0]
         
         postToDiscord(interaction.channelID, client, {
