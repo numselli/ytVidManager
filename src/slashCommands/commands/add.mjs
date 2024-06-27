@@ -3,7 +3,7 @@ import { postToDiscord } from "../../utils/utils.mjs"
 export default {
     name: "add",
     commandLogic: async (interaction, client) => {
-        if (!interaction.data.options.raw[0].value.include("v=")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+        if (!interaction.data.options.raw[0].value.includes("v=")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
             type: 4,
             data: {
                 flags: 64,
