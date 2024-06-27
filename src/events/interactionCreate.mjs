@@ -5,7 +5,7 @@ const { channelID } = await import(
 );
 
 export default async (client, interaction) => {
-	if (channelID !== interaction.channel_id) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+	if (channelID !== interaction.channelID) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
 		type: 4,
 		data: {
 			flags: 64,
