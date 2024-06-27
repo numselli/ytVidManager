@@ -1,7 +1,7 @@
 import interactionsList from "../slashCommands/interactionsList.mjs";
 
 export default async (client, interaction) => {
-	if (client.guildID !== interaction.guild_id) return sharder.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+	if (client.channelID !== interaction.channel_id) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
 		type: 4,
 		data: {
 			flags: 64,
