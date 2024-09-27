@@ -1,6 +1,11 @@
-export const postToDiscord = (disocrdChannel, client, lastRSS)=>{
-    return client.rest.channels.createMessage(disocrdChannel, {
-        content: `# ${lastRSS.author} posted a new video\n${lastRSS.link}`,
+import { genYtUrl } from '../../utils/genYtUrl.mjs'
+
+
+export const postToDiscord = async(disocrdChannel, client, lastRSS)=>{
+    const videoUrl = genYtUrl(lastRSS.videoID)
+
+    client.rest.channels.createMessage(disocrdChannel, {
+        content: `# ${lastRSS.author} posted a new video\n${videoUrl}`,
         components: [
             {
                 type: 1,
@@ -8,7 +13,7 @@ export const postToDiscord = (disocrdChannel, client, lastRSS)=>{
                     {
                         label: "Open",
                         type: 2,
-                        url: lastRSS.link,
+                        url: videoUrl,
                         style: 5,
                     },
                     {

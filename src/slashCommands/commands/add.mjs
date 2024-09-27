@@ -15,7 +15,7 @@ export default {
         
         postToDiscord(interaction.channelID, client, {
             author: "",
-            link: `https://youtube.com/watch?v=${vidID}`
+            videoID: vidID
         })
 
         client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {

@@ -72,7 +72,10 @@ schedule(cronSchedule, () => {
 			channelname: lastRSS.author
 		})
 	
-		postToDiscord(row.disocrdchannel, client, lastRSS)
+		postToDiscord(row.disocrdchannel, client, {
+			author: lastRSS.author, 
+			videoID: vidID
+		})
 	})
 })
 
