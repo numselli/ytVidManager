@@ -78,7 +78,6 @@ schedule(cronSchedule, () => {
 		})
 	
 		postToDiscord(row.disocrdchannel, client, {
-			author: lastRSS.author, 
 			videoID: vidID
 		})
 	})
