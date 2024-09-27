@@ -1,5 +1,4 @@
-import { genYtUrl } from '../../utils/genYtUrl.mjs'
-
+import { genYtUrl } from './genYtUrl.mjs'
 
 export const postToDiscord = async(disocrdChannel, client, lastRSS)=>{
     const videoUrl = genYtUrl(lastRSS.videoID)

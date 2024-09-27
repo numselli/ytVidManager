@@ -1,4 +1,4 @@
-import { postToDiscord } from "../../utils/utils.mjs"
+import { postToDiscord } from "../../utils/post.mjs"
 
 export default {
     name: "add",
