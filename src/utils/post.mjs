@@ -6,7 +6,7 @@ export const postToDiscord = async(disocrdChannel, client, lastRSS)=>{
     const totalAdLength = await getTotalAdLength(lastRSS.videoID)
     const videoLength = await getVideoLength(lastRSS.videoID)
 
-    const videoUrl = genYtUrl(lastRSS.videoID)
+    const videoUrl = genYtUrl(lastRSS.videoID, lastRSS.position)
 
     const message = await client.rest.channels.createMessage(disocrdChannel, {
         content: `# ${lastRSS.author} posted a new video\nLength: ${new Date(videoLength*1000).toISOString().slice(11, 19)} (${new Date(((videoLength-totalAdLength)*1000)).toISOString().slice(11, 19)}) (AD length:${new Date(totalAdLength*1000).toISOString().slice(11, 19)})\n${videoUrl}`,
@@ -41,5 +41,14 @@ export const postToDiscord = async(disocrdChannel, client, lastRSS)=>{
                 ]
             }
         ]
+    })
+
+    client.db.prepare('INSERT INTO videos (videoid, disocrdchannel, messageid, vidlength, adslength, position) VALUES(@videoid, @disocrdchannel, @messageid, @vidlength, @adslength, @position)').run({
+        videoid: lastRSS.videoID, 
+        disocrdchannel: disocrdChannel,
+        messageid: message.id, 
+        vidlength: videoLength, 
+        adslength: totalAdLength,
+        position: lastRSS.position
     })
 }

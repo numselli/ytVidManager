@@ -39,7 +39,12 @@ client.once("ready", async() => {
 	try {
 		db.prepare('CREATE TABLE IF NOT EXISTS channels (channelid TEXT NOT NULL PRIMARY KEY, disocrdchannel TEXT NOT NULL, lastvid TEXT, channelname TEXT) WITHOUT ROWID').run()
 	} catch (error) {
-		console.log("table faild to create")	
+		console.log("channels table faild to create")	
+	}
+	try {
+		db.prepare('CREATE TABLE IF NOT EXISTS videos (messageid TEXT NOT NULL PRIMARY KEY, videoid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, vidlength REAL NOT NULL, adslength REAL NOT NULL, position REAL) WITHOUT ROWID').run()
+	} catch (error) {
+		console.log("videos table faild to create")	
 	}
 
 	const discordCommands = await client.application.getGlobalCommands();
