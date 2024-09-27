@@ -5,7 +5,8 @@ import {schedule} from 'node-cron'
 import interactionCreate from "./events/interactionCreate.mjs";
 import commandList from "./slashCommands/commandList.mjs";
 
-import { postChannelYtVid } from "./utils/utils.mjs";
+import { postToDiscord } from "./utils/post.mjs";
+import { fetchFromRSS } from "./utils/rss.mjs";
 
 const { token, cronSchedule } = await import(
 	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "./static/settings.mjs"
@@ -60,9 +61,19 @@ client.once("ready", async() => {
 
 
 schedule(cronSchedule, () => {
-	db.prepare('SELECT * FROM channels').all().forEach(async row =>
-		postChannelYtVid(row, client)
-	)
+	db.prepare('SELECT * FROM channels').all().forEach(async row => {
+		const lastRSS = await fetchFromRSS(row.channelid)
+		const vidID = lastRSS.id.replace("yt:video:", "")
+	
+		if (vidID === row.lastvid) return;
+		client.db.prepare('UPDATE channels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
+			channelid: row.channelid,
+			lastvid: vidID,
+			channelname: lastRSS.author
+		})
+	
+		postToDiscord(row.disocrdchannel, client, lastRSS)
+	})
 })
 
 
