@@ -5,7 +5,7 @@ import {schedule} from 'node-cron'
 import interactionCreate from "./events/interactionCreate.mjs";
 import commandList from "./slashCommands/commandList.mjs";
 
-import { postToDiscord } from "./utils/post.mjs";
+import postToDiscord from "./utils/post.mjs";
 import fetchFromRSS from "./utils/rss.mjs";
 
 const { token, cronSchedule } = await import(
