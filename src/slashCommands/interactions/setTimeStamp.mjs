@@ -1,10 +1,15 @@
+import genPostMessage from '../../utils/genPostMessage.mjs'
+
 export default {
 	name: "setTimeStamp",
 	logic: async(interaction, sharder) => {
-		const seconds = interaction.data.components[0].components[0].value.split(':').reverse().reduce((prev, curr, i) => prev + curr*Math.pow(60, i), 0)-5
+		const seconds = interaction.data.components.raw[0].components[0].value.split(':').reverse().reduce((prev, curr, i) => prev + curr*Math.pow(60, i), 0)-5
 		
-		if (interaction.message.components[0].components[0].url.includes("&t=")) interaction.message.components[0].components[0].url = `${interaction.message.components[0].components[0].url.split("&t=")[0]}&t=${seconds}`
-		else interaction.message.components[0].components[0].url += `&t=${seconds}`
+		const videoFromDB = sharder.db.prepare('SELECT * FROM videos WHERE messageid = @messageid').all({
+			messageid: interaction.message.id
+		})
+		
+		const discordMessage = genPostMessage(videoFromDB[0].videoid, seconds)
 
 		sharder.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
 			type: 4,
@@ -14,8 +19,6 @@ export default {
 			}
 		}).catch(() => {});
 
-		sharder.rest.channels.editMessage(interaction.channelID, interaction.message.id, {
-			components: interaction.message.components
-		})
+		sharder.rest.channels.editMessage(interaction.channelID, interaction.message.id, discordMessage)
 	}
 };

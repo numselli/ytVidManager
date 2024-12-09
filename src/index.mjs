@@ -6,7 +6,7 @@ import interactionCreate from "./events/interactionCreate.mjs";
 import commandList from "./slashCommands/commandList.mjs";
 
 import { postToDiscord } from "./utils/post.mjs";
-import { fetchFromRSS } from "./utils/rss.mjs";
+import fetchFromRSS from "./utils/rss.mjs";
 
 const { token, cronSchedule } = await import(
 	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "./static/settings.mjs"
@@ -21,7 +21,7 @@ const client = new Client({
 		users: 0,
 	},
 	gateway: {
-		intents: ["GUILDS", "GUILD_MESSAGES"],
+		intents: ["GUILDS"],
 		presence: {
 			status: "dnd"
 		}
@@ -42,7 +42,7 @@ client.once("ready", async() => {
 		console.log("channels table faild to create")	
 	}
 	try {
-		db.prepare('CREATE TABLE IF NOT EXISTS videos (messageid TEXT NOT NULL PRIMARY KEY, videoid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, vidlength REAL NOT NULL, adslength REAL NOT NULL, position REAL) WITHOUT ROWID').run()
+		db.prepare('CREATE TABLE IF NOT EXISTS videos (messageid TEXT NOT NULL PRIMARY KEY, videoid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, position REAL NOT NULL) WITHOUT ROWID').run()
 	} catch (error) {
 		console.log("videos table faild to create")	
 	}
@@ -77,9 +77,7 @@ schedule(cronSchedule, () => {
 			channelname: lastRSS.author
 		})
 	
-		postToDiscord(row.disocrdchannel, client, {
-			videoID: vidID
-		})
+		postToDiscord(row.disocrdchannel, client, vidID)
 	})
 })
 

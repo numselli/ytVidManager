@@ -1,28 +1,40 @@
-import { postToDiscord } from "../../utils/post.mjs"
+import url from 'url'
+
+import postToDiscord from "../../utils/post.mjs"
+import parseYtUrl from '../../utils/parseYtUrl.mjs'
+
+const allowedYtDomains = ["youtu.be", "www.youtube.com", "youtube.com", "m.youtube.com"]
 
 export default {
     name: "add",
     commandLogic: async (interaction, client) => {
-        if (!interaction.data.options.raw[0].value.includes("v=")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+        let urlObject = url.parse(interaction.data.options.raw[0].value, true); 
+
+        if (!allowedYtDomains.includes(urlObject.host)) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                type: 4,
+                data: {
+                    flags: 64,
+                    content: `URL is not a youtube domain`
+                }
+            }).catch(() => {});
+
+        const {vid, t} = parseYtUrl(urlObject)
+        
+        if (vid === '') return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
             type: 4,
             data: {
                 flags: 64,
-                content: `Video does not have a video id.`
+                content: `Unable to parse video id`
             }
         }).catch(() => {});
 
-        const vidID = interaction.data.options.raw[0].value.split("v=")[1].split("&")[0]
-        
-        postToDiscord(interaction.channelID, client, {
-            author: "",
-            videoID: vidID
-        })
+        postToDiscord(interaction.channelID, client, vid, t)
 
         client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
             type: 4,
             data: {
                 flags: 64,
-                content: `added: https://youtube.com/watch?v=${vidID}`
+                content: `added`
             }
         }).catch(() => {});
     },

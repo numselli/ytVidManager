@@ -4,6 +4,7 @@
     "better-sqlite3": "^11.3.0",
     "node-cron": "github:counting-bot/node-cron",
     "oceanic.js": "^1.11.2",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "url": "^0.11.4"
   }
 }
