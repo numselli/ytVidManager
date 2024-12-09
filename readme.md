@@ -6,8 +6,6 @@
 - subscribe to youtube channels
 - manually add videos
 - auto add videos from subscriptions
-- add tags to video posting
-- remove tags from video posting
 - keep track of video progress
 
 ### How to host the bot: 
