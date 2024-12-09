@@ -1,4 +1,4 @@
-import { genYtUrl } from './genYtUrl.mjs'
+import genYtUrl from './genYtUrl.mjs'
 
 export default (videoID, position)=>{
     const videoUrl = genYtUrl(videoID, position)
