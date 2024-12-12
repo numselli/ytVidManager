@@ -7,5 +7,5 @@ const files = [vidDelete, watching, setTimeStamp];
 export default new Map(
 	files.map((file) => {
 		return [file.name, file];
-	}),
+	})
 );

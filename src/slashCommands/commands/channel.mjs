@@ -42,20 +42,7 @@ export default {
                     client.rest.channels.createMessage(interaction.channelID, {
                         content: element
                     })
-                });
-
-
-                // const perChunk = 10
-                // list.reduce((all,one,i) => {
-                //     const ch = Math.floor(i/perChunk); 
-                //     all[ch] = [].concat((all[ch]||[]),one); 
-                //     return all
-                // }, []).forEach(element => {
-                //     client.rest.channels.createMessage(interaction.channelID, {
-                //         content: element.join("\n")
-                //     })
-                // });
-            
+                });            
             break;
         }
     },
@@ -70,7 +57,7 @@ export default {
                     "name": "id",
                     "description": "The yt channel ID you want to subscribe to.",
                     "type": 3,
-                    "required": true,
+                    "required": true
                 }
             ]
         },
@@ -83,7 +70,7 @@ export default {
                     "name": "id",
                     "description": "The yt channel ID you want to unsubscribe from",
                     "type": 3,
-                    "required": true,
+                    "required": true
                 }
             ]
         },

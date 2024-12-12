@@ -21,12 +21,6 @@ export default (videoID, position)=>{
                         style: 1,
                         customID: "watching"
                     },
-                    // {
-                    //     type: 2,
-                    //     label: "Manage tags",
-                    //     style: 1,
-                    //     customID: "manageTags"
-                    // },
                     {
                         type: 2,
                         label: "Remove",

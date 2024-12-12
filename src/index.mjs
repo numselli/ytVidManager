@@ -2,13 +2,13 @@ import { Client } from "oceanic.js";
 import Database from 'better-sqlite3';
 import {schedule} from 'node-cron'
 
-import interactionCreate from "./events/interactionCreate.mjs";
-import commandList from "./slashCommands/commandList.mjs";
+import {commandList, clientCommands} from "./slashCommands/commandList.mjs";
+import interactionsList from "../slashCommands/interactionsList.mjs";
 
 import postToDiscord from "./utils/post.mjs";
 import fetchFromRSS from "./utils/rss.mjs";
 
-const { token, cronSchedule } = await import(
+const { token, cronSchedule, channelID } = await import(
 	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "./static/settings.mjs"
 );
 
@@ -18,7 +18,7 @@ const client = new Client({
 	collectionLimits: {
 		messages: 0,
 		members: 0,
-		users: 0,
+		users: 0
 	},
 	gateway: {
 		intents: ["GUILDS"],
@@ -32,7 +32,12 @@ const client = new Client({
 client.db = db
 
 client.on("error", console.log);
-client.on("interactionCreate", interactionCreate.bind(null, client))
+client.on("interactionCreate", (interaction)=>{
+	if (channelID !== interaction.channelID) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {type: 4, data: {flags: 64, content: "Bot is in private beta"}}).catch(() => {});
+
+	if (interaction.type === 3 || interaction.type === 5) return interactionsList.get(interaction.data.customID.split("_")[0]).logic(interaction, client);
+	clientCommands.get(interaction.data.name).commandFile.commandLogic(interaction, client);
+})
 client.once("ready", async() => {
 	client.application.bulkEditGlobalCommands(commandList)
 
@@ -46,22 +51,6 @@ client.once("ready", async() => {
 	} catch (error) {
 		console.log("videos table faild to create")	
 	}
-
-	const discordCommands = await client.application.getGlobalCommands();
-
-	client.commands = new Map(
-		commandList.map((command) => {
-			return [
-				command.name,
-				{
-					commandFile: command,
-					discordInfo: discordCommands.find((discordCommand) => {
-						return discordCommand.name === command.name;
-					}),
-				},
-			];
-		}),
-	);
 });
 
 
@@ -71,7 +60,7 @@ schedule(cronSchedule, () => {
 		const vidID = lastRSS.id.replace("yt:video:", "")
 	
 		if (vidID === row.lastvid) return;
-		client.db.prepare('UPDATE channels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
+		db.prepare('UPDATE channels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
 			channelid: row.channelid,
 			lastvid: vidID,
 			channelname: lastRSS.author
