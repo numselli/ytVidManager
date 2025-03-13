@@ -3,7 +3,7 @@ import Database from 'better-sqlite3';
 import {schedule} from 'node-cron'
 
 import {commandList, clientCommands} from "./slashCommands/commandList.mjs";
-import interactionsList from "../slashCommands/interactionsList.mjs";
+import interactionsList from "./slashCommands/interactionsList.mjs";
 
 import postToDiscord from "./utils/post.mjs";
 import fetchFromRSS from "./utils/rss.mjs";
