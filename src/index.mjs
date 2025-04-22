@@ -36,7 +36,7 @@ client.on("interactionCreate", (interaction)=>{
 	if (channelID !== interaction.channelID) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {type: 4, data: {flags: 64, content: "Bot is in private beta"}}).catch(() => {});
 
 	if (interaction.type === 3 || interaction.type === 5) return interactionsList.get(interaction.data.customID.split("_")[0]).logic(interaction, client);
-	clientCommands.get(interaction.data.name).commandFile.commandLogic(interaction, client);
+	clientCommands.get(interaction.data.name).commandLogic(interaction, client);
 })
 client.once("ready", async() => {
 	client.application.bulkEditGlobalCommands(commandList)
