@@ -1,4 +1,4 @@
-import url from 'url'
+import urlExtract from '../../utils/urlExtract.mjs'
 
 import postToDiscord from "../../utils/post.mjs"
 import parseYtUrl from '../../utils/parseYtUrl.mjs'
@@ -8,7 +8,7 @@ const allowedYtDomains = ["youtu.be", "www.youtube.com", "youtube.com", "m.youtu
 export default {
     name: "add",
     commandLogic: async (interaction, client) => {
-        let urlObject = url.parse(interaction.data.options.raw[0].value, true); 
+        const urlObject = urlExtract(interaction.data.options.raw[0].value)
 
         if (!allowedYtDomains.includes(urlObject.host)) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                 type: 4,
