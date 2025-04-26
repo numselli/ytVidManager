@@ -1,4 +1,4 @@
-import Parser from 'rss-parser';
+import Parser from "./rssParser.mjs";
 
 const parser = new Parser();
 
