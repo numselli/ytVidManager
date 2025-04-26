@@ -57,16 +57,15 @@ client.once("ready", async() => {
 schedule(cronSchedule, () => {
 	db.prepare('SELECT * FROM channels').all().forEach(async row => {
 		const lastRSS = await fetchFromRSS(row.channelid)
-		const vidID = lastRSS.id.replace("yt:video:", "")
 	
-		if (vidID === row.lastvid) return;
+		if (lastRSS.id === row.lastvid) return;
 		db.prepare('UPDATE channels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
 			channelid: row.channelid,
-			lastvid: vidID,
-			channelname: lastRSS.author
+			lastvid: lastRSS.id,
+			channelname: lastRSS.title
 		})
 	
-		postToDiscord(row.disocrdchannel, client, vidID)
+		postToDiscord(row.disocrdchannel, client, lastRSS.id)
 	})
 })
 
