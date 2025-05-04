@@ -1,3 +1,4 @@
+// length, adlength
 export const getTotalAdLength = async(videoID) => {
     const rawFetch = await fetch(`https://sponsor.ajay.app/api/skipSegments?videoID=${videoID}`)
 
