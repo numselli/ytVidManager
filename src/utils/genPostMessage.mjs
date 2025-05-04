@@ -1,6 +1,6 @@
 import genYtUrl from './genYtUrl.mjs'
 
-export default (videoID, position)=>{
+export default (videoID, position, userID)=>{
     const videoUrl = genYtUrl(videoID, position)
 
     return {
@@ -19,13 +19,13 @@ export default (videoID, position)=>{
                         type: 2,
                         label: "Watching",
                         style: 1,
-                        customID: "watching"
+                        customID: `watching_${userID}`
                     },
                     {
                         type: 2,
                         label: "Remove",
                         style: 4,
-                        customID: "vidDelete"
+                        customID: `vidDelete_${userID}`
                     }
                 ]
             }

@@ -5,10 +5,10 @@ import {schedule} from 'node-cron'
 import {commandList, clientCommands} from "./slashCommands/commandList.mjs";
 import interactionsList from "./slashCommands/interactionsList.mjs";
 
+import rssParser from "./utils/rssParser.mjs";
 import postToDiscord from "./utils/post.mjs";
-import fetchFromRSS from "./utils/rss.mjs";
 
-const { token, cronSchedule, channelID } = await import(
+const { token, cronSchedule } = await import(
 	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "./static/settings.mjs"
 );
 
@@ -33,8 +33,6 @@ client.db = db
 
 client.on("error", console.log);
 client.on("interactionCreate", (interaction)=>{
-	if (channelID !== interaction.channelID) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {type: 4, data: {flags: 64, content: "Bot is in private beta"}}).catch(() => {});
-
 	if (interaction.type === 3 || interaction.type === 5) return interactionsList.get(interaction.data.customID.split("_")[0]).logic(interaction, client);
 	clientCommands.get(interaction.data.name).commandLogic(interaction, client);
 })
@@ -42,32 +40,52 @@ client.once("ready", async() => {
 	client.application.bulkEditGlobalCommands(commandList)
 
 	try {
-		db.prepare('CREATE TABLE IF NOT EXISTS channels (channelid TEXT NOT NULL PRIMARY KEY, disocrdchannel TEXT NOT NULL, lastvid TEXT, channelname TEXT) WITHOUT ROWID').run()
+		db.prepare('CREATE TABLE IF NOT EXISTS channelsubs (ytchannelid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, owner TEXT NOT NULL, PRIMARY KEY (ytchannelid, disocrdchannel)) WITHOUT ROWID').run()
 	} catch (error) {
-		console.log("channels table faild to create")	
+		console.log("channelsubs table faild to create")
+		console.log(error)	
 	}
 	try {
-		db.prepare('CREATE TABLE IF NOT EXISTS videos (messageid TEXT NOT NULL PRIMARY KEY, videoid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, position REAL NOT NULL) WITHOUT ROWID').run()
+		db.prepare('CREATE TABLE IF NOT EXISTS ytchannels (channelid TEXT NOT NULL PRIMARY KEY, lastvid TEXT NOT NULL, channelname TEXT NOT NULL, expires TEXT NOT NULL) WITHOUT ROWID').run()
+	} catch (error) {
+		console.log("ytchannels table faild to create")	
+	}
+	try {
+		db.prepare('CREATE TABLE IF NOT EXISTS videos (messageid TEXT NOT NULL PRIMARY KEY, videoid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, position REAL NOT NULL, owner TEXT NOT NULL) WITHOUT ROWID').run()
 	} catch (error) {
 		console.log("videos table faild to create")	
 	}
 });
 
-
+// setTimeout(()=>{
 schedule(cronSchedule, () => {
-	db.prepare('SELECT * FROM channels').all().forEach(async row => {
-		const lastRSS = await fetchFromRSS(row.channelid)
-	
-		if (lastRSS.id === row.lastvid) return;
-		db.prepare('UPDATE channels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
+	const channelList = db.prepare('SELECT * FROM ytchannels').all()
+	const filteredList = channelList
+	// const now = new Date().getTime()
+	// const filteredList = channelList.filter(v => new Date(v.expires).getTime() <= now)
+	filteredList.forEach(async row => {
+		const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${row.channelid}`);
+
+		const videosToAlert = rssFeed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastvid)).reverse();
+		if (videosToAlert.length === 0) return;
+
+		db.prepare('UPDATE ytchannels SET lastvid = @lastvid, channelname = @channelname, expires = @expires WHERE channelid = @channelid').run({
 			channelid: row.channelid,
-			lastvid: lastRSS.id,
-			channelname: lastRSS.title
+			lastvid: videosToAlert[videosToAlert.length-1].id,
+			channelname: rssFeed.title,
+			expires: rssFeed.expires
 		})
-	
-		postToDiscord(row.disocrdchannel, client, lastRSS.id)
+
+		const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM channelsubs WHERE ytchannelid = @ytchannelid').all({
+			ytchannelid: row.channelid
+		})
+		channelsToSend.forEach(row => {
+			videosToAlert.forEach(v=>{
+				postToDiscord(row.disocrdchannel, client, {vid: v.id, userID: row.owner})
+			})
+		})
 	})
 })
-
+// }, 5*1000)
 
 client.connect();

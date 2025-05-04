@@ -1,1 +1,1 @@
-export default (videoID, time)=> `https://youtube.com/watch?v=${videoID}${time ? `&t=${time}` : ''}`
+export default (videoID, time)=> `https://youtu.be/${videoID}${time && time !== 0 ? `?t=${time}` : ''}`

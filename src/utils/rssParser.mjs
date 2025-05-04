@@ -10,7 +10,7 @@ export default async(feedUrl) => {
     }
   })
 
-  if (req.status !== 200) return new Error("Status code " + req.status)
+  if (req.status !== 200) return {error: true, code: req.status}
 
   const xml = await req.text()
   const { feed } = parser.parse(xml);

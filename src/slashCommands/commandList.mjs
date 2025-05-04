@@ -1,9 +1,9 @@
 import channel from './commands/channel.mjs'
-import add from './commands/add.mjs'
+import videos from './commands/videos.mjs';
 
 export const commandList = [
 	channel,
-	add
+	videos
 ];
 
 export const clientCommands = new Map(
