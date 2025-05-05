@@ -1,12 +1,31 @@
 import rssParser from "../../utils/rssParser.mjs";
 import postToDiscord from "../../utils/post.mjs"
+import urlExtract from "../../utils/urlExtract.mjs";
+
+const allowedYtDomains = ["youtu.be", "www.youtube.com", "youtube.com", "m.youtube.com"]
 
 export default {
     name: "channel",
     commandLogic: async (interaction, client) => {
         switch (interaction.data.options.raw[0].name){
             case "add":{
-                const ytChannelID = interaction.data.options.raw[0].options[0].value
+                const urlObject = urlExtract(interaction.data.options.raw[0].options[0].value);
+                if (!allowedYtDomains.includes(urlObject.host)) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                    type: 4,
+                    data: {
+                        flags: 64,
+                        content: `URL is not a youtube domain`
+                    }
+                }).catch(() => {});
+                if (urlParts.pathname.includes("@")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                    type: 4,
+                    data: {
+                        flags: 64,
+                        content: '@usernames are not currently supported. Use `https://youtube.com/channel/<channel_id>`. To get the channel id, open the channel on youtube, click on `More about this channel ...more`, then click `Share channel` at the bottom, then click `Copy channel ID`'
+                    }
+                }).catch(() => {});
+
+                const ytChannelID = urlParts.pathname
 
                 const feed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${ytChannelID}`)
                 if (feed.error) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
@@ -41,7 +60,23 @@ export default {
             }
             break;
             case "remove":{
-                const ytChannelID = interaction.data.options.raw[0].options[0].value
+                const urlObject = urlExtract(interaction.data.options.raw[0].options[0].value);
+                if (!allowedYtDomains.includes(urlObject.host)) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                    type: 4,
+                    data: {
+                        flags: 64,
+                        content: `URL is not a youtube domain`
+                    }
+                }).catch(() => {});
+                if (urlParts.pathname.includes("@")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                    type: 4,
+                    data: {
+                        flags: 64,
+                        content: '@usernames are not currently supported. Use `https://youtube.com/channel/<channel_id>`. To get the channel id, open the channel on youtube, click on `More about this channel ...more`, then click `Share channel` at the bottom, then click `Copy channel ID`'
+                    }
+                }).catch(() => {});
+
+                const ytChannelID = urlParts.pathname
 
                 const {owner} = client.db.prepare('SELECT owner FROM channelsubs WHERE ytchannelid = @ytchannelid AND disocrdchannel = @disocrdchannel').get({
                     ytchannelid: ytChannelID,
