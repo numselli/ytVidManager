@@ -1,25 +1,35 @@
-name: Update Dependencies
+name: Upgrade NPM packages
 
 on:
   workflow_dispatch:
+
   schedule:
-    - cron: '0 0 * * *' # Runs every day at midnight
+    - cron:  "0 0 * * 0"
 
 jobs:
-  update:
+  upgrade-packages:
+    name: Upgrade packages
+
     runs-on: ubuntu-latest
+
     steps:
-      - name: Update Dependencies
-        run: |
-          cd src
-          npm -g i npm-check-updates
-          ncu -u
-          npm install
-      - name: Create Pull Request
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js ⚙️
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.x'
+          
+      - name: Upgrade packages 🔀
+        run: npm -g i npm-check-updates
+        
+      - name: Upgrade packages 🔀
+        run: ncu -u
+
+      - name: Commit and create PR 🔀
         uses: peter-evans/create-pull-request@v3
         with:
-            commit-message: Update dependencies
-            title: '[DEPENDENCY] Update Dependencies'
-            body: |
-                Updates dependencies in `package.json`.
-            branch: update-dependencies
+          title: 'build(deps): Upgrade NPM packages (automated)'
+          branch: 'build-deps-upgrade-npm-packages-automated'
+          commit-message: 'build(deps): upgrade NPM packages (automated)'
