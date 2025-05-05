@@ -57,7 +57,6 @@ client.once("ready", async() => {
 	}
 });
 
-// setTimeout(()=>{
 schedule(cronSchedule, () => {
 	const channelList = db.prepare('SELECT * FROM ytchannels').all()
 	const filteredList = channelList
@@ -86,6 +85,5 @@ schedule(cronSchedule, () => {
 		})
 	})
 })
-// }, 5*1000)
 
 client.connect();
