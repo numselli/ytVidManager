@@ -11,6 +11,7 @@ jobs:
     steps:
       - name: Update Dependencies
         run: |
+          cd src
           npm -g i npm-check-updates
           ncu -u
           npm install
