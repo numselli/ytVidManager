@@ -9,7 +9,7 @@ export default {
 			messageid: interaction.message.id
 		})
 		
-		const discordMessage = genPostMessage(videoFromDB[0].videoid, seconds)
+		const discordMessage = genPostMessage(videoFromDB[0].videoid, seconds, interaction.user.id)
 
 		client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
 			type: 4,
