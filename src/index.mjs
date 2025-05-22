@@ -75,14 +75,16 @@ schedule(cronSchedule, () => {
 			expires: rssFeed.expires
 		})
 
-		const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM channelsubs WHERE ytchannelid = @ytchannelid').all({
-			ytchannelid: row.channelid
-		})
-		channelsToSend.forEach(row => {
-			videosToAlert.forEach(v=>{
-				postToDiscord(row.disocrdchannel, client, {vid: v.id, userID: row.owner})
+		if (rssFeed.items.find(a => a.id===row.lastvid)){
+			const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM channelsubs WHERE ytchannelid = @ytchannelid').all({
+				ytchannelid: row.channelid
 			})
-		})
+			channelsToSend.forEach(row => {
+				videosToAlert.forEach(v=>{
+					postToDiscord(row.disocrdchannel, client, {vid: v.id, userID: row.owner})
+				})
+			})
+		}
 	})
 })
 
