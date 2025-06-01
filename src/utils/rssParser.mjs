@@ -19,7 +19,7 @@ export default async(feedUrl) => {
     date: req.headers.get('date'),
     expires: req.headers.get('expires'),
     title: feed.title,
-    items: Array.isArray(feed.entry) ? feed.entry.map(formatEntry) : formatEntry(feed.entry)
+    items: Array.isArray(feed.entry) ? feed.entry.map(formatEntry) : [formatEntry(feed.entry)]
   }
 }
 
