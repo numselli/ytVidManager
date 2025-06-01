@@ -19,12 +19,14 @@ export default async(feedUrl) => {
     date: req.headers.get('date'),
     expires: req.headers.get('expires'),
     title: feed.title,
-    items: feed.entry.map(item=> {
-      return {
-        title: item.title,
-        id: item['yt:videoId'],
-        published: item.published
-      }
-    })
+    items: Array.isArray(feed.entry) ? feed.entry.map(formatEntry) : formatEntry(feed.entry)
+  }
+}
+
+const formatEntry = (item) => {
+  return {
+    title: item.title,
+    id: item['yt:videoId'],
+    published: item.published
   }
 }
