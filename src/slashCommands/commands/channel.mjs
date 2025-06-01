@@ -17,7 +17,7 @@ export default {
                         content: `URL is not a youtube domain`
                     }
                 }).catch(() => {});
-                if (urlParts.pathname.includes("@")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                if (urlObject.pathname.includes("@")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
                     data: {
                         flags: 64,
@@ -25,7 +25,7 @@ export default {
                     }
                 }).catch(() => {});
 
-                const ytChannelID = urlParts.pathname
+                const ytChannelID = urlObject.pathname
 
                 const feed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${ytChannelID}`)
                 if (feed.error) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
@@ -68,7 +68,7 @@ export default {
                         content: `URL is not a youtube domain`
                     }
                 }).catch(() => {});
-                if (urlParts.pathname.includes("@")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                if (urlObject.pathname.includes("@")) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
                     data: {
                         flags: 64,
@@ -76,7 +76,7 @@ export default {
                     }
                 }).catch(() => {});
 
-                const ytChannelID = urlParts.pathname
+                const ytChannelID = urlObject.pathname
 
                 const {owner} = client.db.prepare('SELECT owner FROM channelsubs WHERE ytchannelid = @ytchannelid AND disocrdchannel = @disocrdchannel').get({
                     ytchannelid: ytChannelID,
