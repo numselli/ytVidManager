@@ -90,14 +90,15 @@ export default {
                     }
                 }).catch(() => {});
                 
-                client.db.prepare('DELETE FROM channelsubs WHERE ytchannelid = @ytchannelid AND disocrdchannel = @disocrdchannel').run({
-                    ytchannelid: interaction.data.options.raw[0].options[0].value,
-                    disocrdchannel: interaction.channelID
+                client.db.prepare('DELETE FROM channelsubs WHERE ytchannelid = @ytchannelid AND disocrdchannel = @disocrdchannel AND owner = @owner').run({
+                    ytchannelid: ytChannelID,
+                    disocrdchannel: interaction.channelID,
+                    owner: interaction.user.id
                 })
                 client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
                     data: {
-                        content: `removed: https://youtube.com/channel/${interaction.data.options.raw[0].options[0].value}`
+                        content: `removed: https://youtube.com/channel/${ytChannelID}`
     
                     }
                 }).catch(() => {});
