@@ -1,4 +1,4 @@
-import genPostMessage from '../../utils/genPostMessage.mjs'
+import genPostMessage from '../../utils/genYTPostMessage.mjs'
 
 export default {
 	name: "setTimeStamp",
