@@ -1,0 +1,1 @@
+export default (pid, sub, cid)=> `https://reddit.com/r/${sub}/comments/${pid}${cid == '' ? '' : `/comment/${cid}`}`

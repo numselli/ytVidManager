@@ -39,6 +39,7 @@ client.on("interactionCreate", (interaction)=>{
 client.once("ready", async() => {
 	client.application.bulkEditGlobalCommands(commandList)
 
+	// create tables for YT
 	try {
 		db.prepare('CREATE TABLE IF NOT EXISTS channelsubs (ytchannelid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, owner TEXT NOT NULL, PRIMARY KEY (ytchannelid, disocrdchannel)) WITHOUT ROWID').run()
 	} catch (error) {
@@ -54,6 +55,12 @@ client.once("ready", async() => {
 		db.prepare('CREATE TABLE IF NOT EXISTS videos (messageid TEXT NOT NULL PRIMARY KEY, videoid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, position REAL NOT NULL, owner TEXT NOT NULL) WITHOUT ROWID').run()
 	} catch (error) {
 		console.log("videos table faild to create")	
+	}
+	// create tables for rdt
+	try {
+		db.prepare('CREATE TABLE IF NOT EXISTS rdtposts (messageid TEXT NOT NULL PRIMARY KEY, pid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, cid TEXT NOT NULL, owner TEXT NOT NULL) WITHOUT ROWID').run()
+	} catch (error) {
+		console.log("rdtposts table faild to create")	
 	}
 });
 
