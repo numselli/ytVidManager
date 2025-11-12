@@ -1,10 +1,12 @@
 export default (url) => {
     const domainRaw = url.replace("https://", '').replace("http://", '')
-    const splitDomainRaw = domainRaw.split('/')
+    const qSplit = domainRaw.split("?")
 
-    const domain = splitDomainRaw[0]
-    const path = splitDomainRaw.pop().split("?")[0]
-    const query = parseQuery(domainRaw.split("?")?.[1])
+    const splitDomainRaw = qSplit[0].split('/')
+
+    const domain = splitDomainRaw.shift()
+    const path = splitDomainRaw
+    const query = parseQuery(qSplit?.[1])
 
     return {
         host: domain, 
