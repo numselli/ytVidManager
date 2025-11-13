@@ -128,7 +128,7 @@ export default {
     description: "Veiw and edit posts on reading list",
     options: [
         {
-            "name": "addp",
+            "name": "add",
             "description": "Adds a post to the list",
             "type": 1,
 			"options":[
@@ -141,7 +141,7 @@ export default {
             ]
         },
         {
-            "name": "removep",
+            "name": "remove",
             "description": "removes a post",
             "type": 1,
 			"options":[
@@ -154,7 +154,7 @@ export default {
             ]
         },
         {
-            "name": "listall",
+            "name": "list",
             "description": "Lists the posts on reading list",
             "type": 1
         }
