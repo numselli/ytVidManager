@@ -1,4 +1,4 @@
-import genPostMessage from '../../utils/genYTPostMessage.mjs'
+import genPostMessage from './genYTPostMessage.mjs'
 
 export default async(channelID, client, vidStat)=>{
     const messageToSend = genPostMessage(vidStat.vid, vidStat.t, vidStat.userID)
