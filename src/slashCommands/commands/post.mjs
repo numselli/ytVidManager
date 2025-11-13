@@ -1,5 +1,6 @@
 import urlExtract from '../../utils/urlExtract.mjs'
 import parseRDUrl from '../../utils/parseRDUrl.mjs'
+import postToDiscord from '../../utils/rdtPost.mjs'
 
 const allowedRdditDomains = ["reddit.com", "www.reddit.com"]
 
