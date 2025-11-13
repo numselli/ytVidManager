@@ -5,10 +5,10 @@ export default async(channelID, client, postStat)=>{
     const message = await client.rest.channels.createMessage(channelID, messageToSend).catch(()=>{})
 
     client.db.prepare('INSERT INTO rdtposts (pid, cid, disocrdchannel, messageid, owner) VALUES(@pid, @cid, @disocrdchannel, @messageid, @owner)').run({
-        pid: vidStat.pid, 
-        cid: vidStat.cid,
+        pid: postStat.pid, 
+        cid: postStat.cid,
         disocrdchannel: channelID,
         messageid: message.id,
-        owner: vidStat.userID
+        owner: postStat.userID
     })
 }
