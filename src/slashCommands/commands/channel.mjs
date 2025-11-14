@@ -29,12 +29,12 @@ export default {
 
                 const feed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${ytChannelID}`)
                 if (feed.error) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
-                        type: 4,
-                        data: {
-                            flags: 64,
-                            content: `An error has occured. Error code: ${feed.code}`
-                        }
-                    }).catch(() => {});
+                    type: 4,
+                    data: {
+                        flags: 64,
+                        content: `An error has occured. Error code: ${feed.code}`
+                    }
+                }).catch(() => {});
 
                 client.db.prepare('INSERT OR IGNORE INTO ytchannels (channelid, lastvid, channelname, expires) VALUES (@channelid, @lastvid, @channelname, @expires)').run({
                     channelid: ytChannelID,
@@ -86,7 +86,7 @@ export default {
                     type: 4,
                     data: {
                         flags: 64,
-                        content: "You are not allowed to remove this video. You must be the person who added the video to the list."
+                        content: "You are not allowed to remove this channel. You must be the person who added the channel."
                     }
                 }).catch(() => {});
                 
