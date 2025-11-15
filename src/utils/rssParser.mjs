@@ -15,18 +15,33 @@ export default async(feedUrl) => {
   const xml = await req.text()
   const { feed } = parser.parse(xml);
 
-  return {
-    date: req.headers.get('date'),
-    expires: req.headers.get('expires'),
-    title: feed.title,
-    items: Array.isArray(feed.entry) ? feed.entry.map(formatEntry) : [formatEntry(feed.entry)]
+  if (feedUrl.includes("youtube")){
+    return {
+      date: req.headers.get('date'),
+      expires: req.headers.get('expires'),
+      title: feed.title,
+      items: Array.isArray(feed.entry) ? feed.entry.map(formatYTEntry) : [formatYTEntry(feed.entry)]
+    }
+  } else {
+    return {
+      updated: feed.updated,
+      title: feed.title,
+      entry: Array.isArray(feed.entry) ? feed.entry.map(formatRdtEntry) : [formatRdtEntry(feed.entry)]
+    }
   }
 }
 
-const formatEntry = (item) => {
+const formatYTEntry = (item) => {
   return {
     title: item.title,
     id: item['yt:videoId'],
     published: item.published
+  }
+}
+const formatRdtEntry = (item) => {
+  return {
+    title: item.title,
+    id: item.id,
+    published: item.published,
   }
 }

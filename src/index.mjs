@@ -7,6 +7,7 @@ import interactionsList from "./slashCommands/interactionsList.mjs";
 
 import rssParser from "./utils/rssParser.mjs";
 import postToDiscord from "./utils/post.mjs";
+import rdtPostToDiscord from './utils/rdtPost.mjs'
 
 const { token, cronSchedule } = await import(
 	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "./static/settings.mjs"
@@ -56,7 +57,19 @@ client.once("ready", async() => {
 	} catch (error) {
 		console.log("videos table faild to create")	
 	}
+
 	// create tables for rdt
+	try {
+		db.prepare('CREATE TABLE IF NOT EXISTS communitiessubs (sub TEXT NOT NULL, disocrdchannel TEXT NOT NULL, owner TEXT NOT NULL, PRIMARY KEY (sub, disocrdchannel)) WITHOUT ROWID').run()
+	} catch (error) {
+		console.log("communities table faild to create")
+		console.log(error)	
+	}
+	try {
+		db.prepare('CREATE TABLE IF NOT EXISTS subs (sub TEXT NOT NULL PRIMARY KEY, lastpost TEXT NOT NULL, subname TEXT NOT NULL, lastupdated TEXT NOT NULL) WITHOUT ROWID').run()
+	} catch (error) {
+		console.log("subs table faild to create")	
+	}
 	try {
 		db.prepare('CREATE TABLE IF NOT EXISTS rdtposts (messageid TEXT NOT NULL PRIMARY KEY, pid TEXT NOT NULL, disocrdchannel TEXT NOT NULL, cid TEXT NOT NULL, owner TEXT NOT NULL) WITHOUT ROWID').run()
 	} catch (error) {
@@ -65,6 +78,7 @@ client.once("ready", async() => {
 });
 
 schedule(cronSchedule, () => {
+	// yt
 	const channelList = db.prepare('SELECT * FROM ytchannels').all()
 	const filteredList = channelList
 	// const now = new Date().getTime()
@@ -89,6 +103,37 @@ schedule(cronSchedule, () => {
 			channelsToSend.forEach(row => {
 				videosToAlert.forEach(v=>{
 					postToDiscord(row.disocrdchannel, client, {vid: v.id, userID: row.owner})
+				})
+			})
+		}
+	})
+
+
+
+	// rddt
+	const communitiesList = db.prepare('SELECT * FROM subs').all()
+	const communitiesFilteredList = communitiesList
+	// const now = new Date().getTime()
+	// const filteredList = communitiesList.filter(v => new Date(v.expires).getTime() <= now)
+	communitiesFilteredList.forEach(async row => {
+		const rssFeed = await rssParser(`https://www.reddit.com/r/${row.sub}/new.rss`);
+
+		const postsToAlert = rssFeed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastpost)).reverse();
+		if (postsToAlert.length === 0) return;
+
+		db.prepare('UPDATE subs SET lastpost = @lastpost, lastupdated = @lastupdated WHERE sub = @sub').run({
+			sub: row.sub,
+			lastpost: postsToAlert[postsToAlert.length-1].id,
+			lastupdated: rssFeed.lastupdated
+		})
+
+		if (rssFeed.items.find(a => a.id===row.lastpost)){
+			const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM communitiessubs WHERE sub = @sub').all({
+				sub: row.sub
+			})
+			channelsToSend.forEach(rowCh => {
+				postsToAlert.forEach(v=>{
+					rdtPostToDiscord(rowCh.disocrdchannel, client, {pid: v.id, sub: row.sub, cid: '', userID: rowCh.owner})
 				})
 			})
 		}
