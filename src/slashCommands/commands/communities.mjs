@@ -39,7 +39,7 @@ export default {
 
                 client.db.prepare('INSERT OR IGNORE INTO subs (sub, lastpost, subname, lastupdated) VALUES (@sub, @lastpost, @subname, @lastupdated)').run({
                     sub: rdtSubID,
-                    lastpost: feed.items[0].id,
+                    lastpost: feed.entry[0].id,
                     subname: feed.title,
                     lastupdated: new Date(feed.updated).toISOString()
                 })
@@ -50,7 +50,7 @@ export default {
                     owner: interaction.user.id
                 })
 
-                postToDiscord(interaction.channelID, client, {pid: feed.items[0].id, cid:'', sub:rdtSubID, userID:interaction.user.id})
+                postToDiscord(interaction.channelID, client, {pid: feed.entry[0].id, cid:'', sub:rdtSubID, userID:interaction.user.id})
 
                 client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,

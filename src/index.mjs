@@ -118,7 +118,7 @@ schedule(cronSchedule, () => {
 	communitiesFilteredList.forEach(async row => {
 		const rssFeed = await rssParser(`https://www.reddit.com/r/${row.sub}/new.rss`);
 
-		const postsToAlert = rssFeed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastpost)).reverse();
+		const postsToAlert = rssFeed.entry.slice(0, rssFeed.entry.findIndex(a=>a.id===row.lastpost)).reverse();
 		if (postsToAlert.length === 0) return;
 
 		db.prepare('UPDATE subs SET lastpost = @lastpost, lastupdated = @lastupdated WHERE sub = @sub').run({
@@ -127,7 +127,7 @@ schedule(cronSchedule, () => {
 			lastupdated: rssFeed.lastupdated
 		})
 
-		if (rssFeed.items.find(a => a.id===row.lastpost)){
+		if (rssFeed.entry.find(a => a.id===row.lastpost)){
 			const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM communitiessubs WHERE sub = @sub').all({
 				sub: row.sub
 			})
