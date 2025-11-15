@@ -18,7 +18,7 @@ export default {
                         content: `URL is not a reddit domain`
                     }
                 }).catch(() => {});
-                if (!urlObject.pathname[0] !== 'r') return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                if (urlObject.pathname[0] !== 'r') return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
                     data: {
                         flags: 64,
@@ -70,7 +70,7 @@ export default {
                         content: `URL is not a reddit domain`
                     }
                 }).catch(() => {});
-                if (!urlObject.pathname[0] !== 'r') return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
+                if (urlObject.pathname[0] !== 'r') return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
                     data: {
                         flags: 64,
