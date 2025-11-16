@@ -121,10 +121,10 @@ schedule(cronSchedule, () => {
 		const postsToAlert = rssFeed.entry.slice(0, rssFeed.entry.findIndex(a=>a.id===row.lastpost)).reverse();
 		if (postsToAlert.length === 0) return;
 
-		db.prepare('UPDATE subs SET lastpost = @lastpost, lastupdated = @lastupdated WHERE sub = @sub').run({
+		db.prepare('UPDATE subs SET lastpost = @lastpost, lastupdated = @updated WHERE sub = @sub').run({
 			sub: row.sub,
 			lastpost: postsToAlert[postsToAlert.length-1].id,
-			lastupdated: rssFeed.lastupdated
+			updated: rssFeed.updated
 		})
 
 		if (rssFeed.entry.find(a => a.id===row.lastpost)){
