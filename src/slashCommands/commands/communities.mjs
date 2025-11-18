@@ -92,7 +92,7 @@ export default {
                     }
                 }).catch(() => {});
                 
-                client.db.prepare('DELETE FROM channelsubs WHERE sub = @sub AND disocrdchannel = @disocrdchannel AND owner = @owner').run({
+                client.db.prepare('DELETE FROM communitiessubs WHERE sub = @sub AND disocrdchannel = @disocrdchannel AND owner = @owner').run({
                     sub: rdtSubID,
                     disocrdchannel: interaction.channelID,
                     owner: interaction.user.id
