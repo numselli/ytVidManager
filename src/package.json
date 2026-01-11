@@ -1,7 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "better-sqlite3": "^12.5.0",
+    "better-sqlite3": "^12.6.0",
     "fast-xml-parser": "^5.3.3",
     "node-cron": "github:counting-bot/node-cron",
     "oceanic.js": "^1.13.0"
