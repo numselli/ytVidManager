@@ -79,16 +79,16 @@ client.once("ready", async() => {
 });
 
 const processYt = (row, feed) => {
-	const videosToAlert = rssFeed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastvid)).reverse();
+	const videosToAlert = feed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastvid)).reverse();
 	if (videosToAlert.length === 0) return;
 
 	db.prepare('UPDATE ytchannels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
 		channelid: row.channelid,
 		lastvid: videosToAlert[videosToAlert.length-1].id,
-		channelname: rssFeed.title
+		channelname: feed.title
 	})
 
-	if (rssFeed.items.find(a => a.id===row.lastvid)){
+	if (feed.items.find(a => a.id===row.lastvid)){
 		const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM channelsubs WHERE ytchannelid = @ytchannelid').all({
 			ytchannelid: row.channelid
 		})
