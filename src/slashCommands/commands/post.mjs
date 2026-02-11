@@ -1,6 +1,7 @@
 import urlExtract from '../../utils/urlExtract.mjs'
 import parseRDUrl from '../../utils/parseRDUrl.mjs'
 import postToDiscord from '../../utils/rdtPost.mjs'
+import genRdtUrl from '../../utils/genRdtUrl.mjs'
 
 const allowedRdditDomains = ["reddit.com", "www.reddit.com"]
 
@@ -99,7 +100,7 @@ export default {
                     disocrdchannel: interaction.channelID
                 })
 
-                const messageContent = `# (${postList.length}) Posts:\n` + postList.map(post=>`- [name](<${genUrl(post.pid)}>)`).join('\n')
+                const messageContent = `# (${postList.length}) Posts:\n` + postList.map(post=>`- [name](<${genRdtUrl(post.pid, null, post.cid)}>)`).join('\n')
                 const messageParts = messageContent.match(/[\s\S]{1,2000}$/gm);
 
                 if (messageParts.length === 1) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
