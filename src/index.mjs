@@ -8,6 +8,7 @@ import interactionsList from "./slashCommands/interactionsList.mjs";
 import rssParser from "./utils/rssParser.mjs";
 import postToDiscord from "./utils/post.mjs";
 import rdtPostToDiscord from './utils/rdtPost.mjs'
+import ytAPI from "./utils/ytAPI.mjs";
 
 const { token, cronSchedule } = await import(
 	process.env.NODE_ENV === "production" ? "/static/settings.mjs" : "./static/settings.mjs"
@@ -77,45 +78,45 @@ client.once("ready", async() => {
 	}
 });
 
-schedule(cronSchedule, () => {
-	// yt
-	const channelList = db.prepare('SELECT * FROM ytchannels').all()
-	const filteredList = channelList
-	// const now = new Date().getTime()
-	// const filteredList = channelList.filter(v => new Date(v.expires).getTime() <= now)
-	filteredList.forEach(async row => {
-		const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${row.channelid}`);
+const processYt = (row, feed) => {
+	const videosToAlert = rssFeed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastvid)).reverse();
+	if (videosToAlert.length === 0) return;
 
-		const videosToAlert = rssFeed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastvid)).reverse();
-		if (videosToAlert.length === 0) return;
-
-		db.prepare('UPDATE ytchannels SET lastvid = @lastvid, channelname = @channelname, expires = @expires WHERE channelid = @channelid').run({
-			channelid: row.channelid,
-			lastvid: videosToAlert[videosToAlert.length-1].id,
-			channelname: rssFeed.title,
-			expires: rssFeed.expires
-		})
-
-		if (rssFeed.items.find(a => a.id===row.lastvid)){
-			const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM channelsubs WHERE ytchannelid = @ytchannelid').all({
-				ytchannelid: row.channelid
-			})
-			channelsToSend.forEach(row => {
-				videosToAlert.forEach(v=>{
-					postToDiscord(row.disocrdchannel, client, {vid: v.id, userID: row.owner})
-				})
-			})
-		}
+	db.prepare('UPDATE ytchannels SET lastvid = @lastvid, channelname = @channelname, expires = @expires WHERE channelid = @channelid').run({
+		channelid: row.channelid,
+		lastvid: videosToAlert[videosToAlert.length-1].id,
+		channelname: rssFeed.title,
+		expires: rssFeed.expires
 	})
 
+	if (rssFeed.items.find(a => a.id===row.lastvid)){
+		const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM channelsubs WHERE ytchannelid = @ytchannelid').all({
+			ytchannelid: row.channelid
+		})
+		channelsToSend.forEach(row => {
+			videosToAlert.forEach(v=>{
+				postToDiscord(row.disocrdchannel, client, {vid: v.id, userID: row.owner})
+			})
+		})
+	}
+}
 
+schedule(cronSchedule, async () => {
+	// yt
+	const channelList = db.prepare('SELECT * FROM ytchannels').all()
+	const erroredRss = await Promise.all(channelList.map(async row => {
+		const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${row.channelid}`);
+		if (rssFeed.error) return {...row, error: true};
+		processYt(row, rssFeed)
+	}))
+	erroredRss.filter(a=>a.error).forEach(row => {
+		const feed = ytAPI(row.channelid)
+		processYt(row, feed)
+	});
 
 	// rddt
 	const communitiesList = db.prepare('SELECT * FROM subs').all()
-	const communitiesFilteredList = communitiesList
-	// const now = new Date().getTime()
-	// const filteredList = communitiesList.filter(v => new Date(v.expires).getTime() <= now)
-	communitiesFilteredList.forEach(async row => {
+	communitiesList.forEach(async row => {
 		const rssFeed = await rssParser(`https://www.reddit.com/r/${row.sub}/new.rss`);
 
 		const postsToAlert = rssFeed.entry.slice(0, rssFeed.entry.findIndex(a=>a.id===row.lastpost)).reverse();
