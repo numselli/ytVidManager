@@ -3,7 +3,7 @@ const { ytKey } = await import(process.env.NODE_ENV === "production" ? "/static/
 export default async channelID => {
     const playlistId = `${channelID.slice(0, 1)}U${channelID.slice(2)}`
 
-    const rawFetch = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&key=${ytKey}&playlistId=${playlistId}`)
+    const rawFetch = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=15&key=${ytKey}&playlistId=${playlistId}`)
     const fetchJson = await rawFetch.json()
 
     const date = new Date()

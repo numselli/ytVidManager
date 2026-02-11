@@ -109,8 +109,8 @@ schedule(cronSchedule, async () => {
 		processYt(row, rssFeed)
 		return {error: false}
 	}))
-	erroredRss.filter(a=>a.error).forEach(row => {
-		const feed = ytAPI(row.channelid)
+	erroredRss.filter(a=>a.error).forEach(async row => {
+		const feed = await ytAPI(row.channelid)
 		processYt(row, feed)
 	});
 
