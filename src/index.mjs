@@ -79,7 +79,7 @@ client.once("ready", async() => {
 });
 
 const processYt = (row, feed) => {
-	const videosToAlert = feed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastvid)).reverse();
+	const videosToAlert = feed.items.slice(0, feed.items.findIndex(a=>a.id===row.lastvid)).reverse();
 	if (videosToAlert.length === 0) return;
 
 	db.prepare('UPDATE ytchannels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
@@ -107,6 +107,7 @@ schedule(cronSchedule, async () => {
 		const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${row.channelid}`);
 		if (rssFeed.error) return {...row, error: true};
 		processYt(row, rssFeed)
+		return {error: false}
 	}))
 	erroredRss.filter(a=>a.error).forEach(row => {
 		const feed = ytAPI(row.channelid)
