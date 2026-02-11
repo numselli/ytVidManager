@@ -105,7 +105,7 @@ schedule(cronSchedule, async () => {
 	const channelList = db.prepare('SELECT * FROM ytchannels').all()
 	const erroredRss = await Promise.all(channelList.map(async row => {
 		const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${row.channelid}`);
-		if (rssFeed.error) return {...row, error: true};
+		if (rssFeed.error || !rssFeed.items) return {...row, error: true};
 		processYt(row, rssFeed)
 		return {error: false}
 	}))
