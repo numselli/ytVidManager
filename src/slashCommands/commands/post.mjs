@@ -117,7 +117,9 @@ export default {
                     }
                 }).catch(() => {});
 
-                parts.forEach((element, index) => {
+                messageParts.shift()
+                
+                messageParts.forEach((element, index) => {
                     if (index === 0) return;
                     client.rest.channels.createMessage(interaction.channelID, {
                         content: element

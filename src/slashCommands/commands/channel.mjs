@@ -26,8 +26,8 @@ export default {
                 }).catch(() => {});
 
                 const ytChannelID = urlObject.pathname
-                const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${row.channelid}`);
-                const feed = rssFeed.error ? await ytAPI(row.channelid): rssFeed 
+                const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${ytChannelID}`);
+                const feed = rssFeed.error ? await ytAPI(ytChannelID): rssFeed 
                 
                 if (!feed) return client.rest.interactions.createInteractionResponse(interaction.id, interaction.token, {
                     type: 4,
@@ -125,6 +125,8 @@ export default {
                         content: messageParts[0]
                     }
                 }).catch(() => {});
+                
+                messageParts.shift()
 
                 messageParts.forEach((element, index) => {
                     if (index === 0) return;
