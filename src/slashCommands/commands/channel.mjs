@@ -37,11 +37,10 @@ export default {
                     }
                 }).catch(() => {});
 
-                client.db.prepare('INSERT OR IGNORE INTO ytchannels (channelid, lastvid, channelname, expires) VALUES (@channelid, @lastvid, @channelname, @expires)').run({
+                client.db.prepare('INSERT OR IGNORE INTO ytchannels (channelid, lastvid, channelname) VALUES (@channelid, @lastvid, @channelname)').run({
                     channelid: ytChannelID,
                     lastvid: feed.items[0].id,
-                    channelname: feed.title,
-                    expires: new Date(feed.expires).toISOString()
+                    channelname: feed.title
                 })
 
                 client.db.prepare('INSERT OR IGNORE INTO channelsubs (ytchannelid, disocrdchannel, owner) VALUES (@ytchannelid, @disocrdchannel, @owner)').run({

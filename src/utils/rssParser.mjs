@@ -18,7 +18,6 @@ export default async(feedUrl) => {
   if (feedUrl.includes("youtube")){
     return {
       date: req.headers.get('date'),
-      expires: req.headers.get('expires'),
       title: feed.title,
       items: Array.isArray(feed.entry) ? feed.entry.map(formatYTEntry) : [formatYTEntry(feed.entry)]
     }

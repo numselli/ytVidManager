@@ -7,11 +7,9 @@ export default async channelID => {
     const fetchJson = await rawFetch.json()
 
     const date = new Date()
-    const expires = new Date(date.getTime()+60*60*1000);
 
     return {
         date,
-        expires,
         title: fetchJson.items[0].snippet.videoOwnerChannelTitle,
         items: fetchJson.items.map(item=>{
             return {

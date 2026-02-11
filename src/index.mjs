@@ -49,7 +49,7 @@ client.once("ready", async() => {
 		console.log(error)	
 	}
 	try {
-		db.prepare('CREATE TABLE IF NOT EXISTS ytchannels (channelid TEXT NOT NULL PRIMARY KEY, lastvid TEXT NOT NULL, channelname TEXT NOT NULL, expires TEXT NOT NULL) WITHOUT ROWID').run()
+		db.prepare('CREATE TABLE IF NOT EXISTS ytchannels (channelid TEXT NOT NULL PRIMARY KEY, lastvid TEXT NOT NULL, channelname TEXT NOT NULL) WITHOUT ROWID').run()
 	} catch (error) {
 		console.log("ytchannels table faild to create")	
 	}
@@ -82,11 +82,10 @@ const processYt = (row, feed) => {
 	const videosToAlert = rssFeed.items.slice(0, rssFeed.items.findIndex(a=>a.id===row.lastvid)).reverse();
 	if (videosToAlert.length === 0) return;
 
-	db.prepare('UPDATE ytchannels SET lastvid = @lastvid, channelname = @channelname, expires = @expires WHERE channelid = @channelid').run({
+	db.prepare('UPDATE ytchannels SET lastvid = @lastvid, channelname = @channelname WHERE channelid = @channelid').run({
 		channelid: row.channelid,
 		lastvid: videosToAlert[videosToAlert.length-1].id,
-		channelname: rssFeed.title,
-		expires: rssFeed.expires
+		channelname: rssFeed.title
 	})
 
 	if (rssFeed.items.find(a => a.id===row.lastvid)){
