@@ -25,7 +25,7 @@ export default {
                     }
                 }).catch(() => {});
 
-                const ytChannelID = urlObject.pathname
+                const ytChannelID = urlObject.pathname[1]
                 const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${ytChannelID}`);
                 const feed = rssFeed.error ? await ytAPI(ytChannelID): rssFeed 
                 
@@ -125,7 +125,7 @@ export default {
                         content: messageParts[0]
                     }
                 }).catch(() => {});
-                
+
                 messageParts.shift()
 
                 messageParts.forEach((element, index) => {
