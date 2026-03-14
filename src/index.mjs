@@ -100,8 +100,7 @@ const processYt = (row, feed) => {
 	}
 }
 
-schedule(cronSchedule, async () => {
-	// yt
+async function ytSchedule(){
 	const channelList = db.prepare('SELECT * FROM ytchannels').all()
 	const erroredRss = await Promise.all(channelList.map(async row => {
 		const rssFeed = await rssParser(`https://www.youtube.com/feeds/videos.xml?channel_id=${row.channelid}`);
@@ -113,8 +112,9 @@ schedule(cronSchedule, async () => {
 		const feed = await ytAPI(row.channelid)
 		processYt(row, feed)
 	});
+}
 
-	// rddt
+async function rddtSchedule() {
 	const communitiesList = db.prepare('SELECT * FROM subs').all()
 	communitiesList.forEach(async row => {
 		const rssFeed = await rssParser(`https://www.reddit.com/r/${row.sub}/new.rss`);
@@ -139,6 +139,15 @@ schedule(cronSchedule, async () => {
 			})
 		}
 	})
+}
+
+schedule(cronSchedule, async () => {
+	// yt
+	ytSchedule()
+
+
+	// rddt
+	rddtSchedule()
 })
 
 client.connect();
