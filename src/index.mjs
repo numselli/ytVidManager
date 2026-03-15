@@ -79,6 +79,7 @@ client.once("ready", async() => {
 });
 
 const processYt = (row, feed) => {
+	if (!feed) return;
 	const videosToAlert = feed.items.slice(0, feed.items.findIndex(a=>a.id===row.lastvid)).reverse();
 	if (videosToAlert.length === 0) return;
 

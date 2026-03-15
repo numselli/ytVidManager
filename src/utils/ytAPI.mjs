@@ -6,6 +6,8 @@ export default async channelID => {
     const rawFetch = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=15&key=${ytKey}&playlistId=${playlistId}`)
     const fetchJson = await rawFetch.json()
 
+    if (fetchJson.error) return console.log(`${channelID}, errored ${fetchJson.error.code}`)
+
     const date = new Date()
 
     return {
