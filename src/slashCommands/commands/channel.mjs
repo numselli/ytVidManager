@@ -76,7 +76,7 @@ export default {
                     }
                 }).catch(() => {});
 
-                const ytChannelID = urlObject.pathname
+                const ytChannelID = urlObject.pathname[1]
 
                 const {owner} = client.db.prepare('SELECT owner FROM channelsubs WHERE ytchannelid = @ytchannelid AND disocrdchannel = @disocrdchannel').get({
                     ytchannelid: ytChannelID,
