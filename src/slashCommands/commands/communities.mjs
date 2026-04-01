@@ -107,7 +107,7 @@ export default {
             }
             break;
             case "list": {
-                const sublist = client.db.prepare('SELECT sub, owner, subname FROM communitiessubs INNER JOIN subs ON subs.sub = communitiessubs.sub WHERE communitiessubs.disocrdchannel = @disocrdchannel').all({
+                const sublist = client.db.prepare('SELECT subs.sub, owner, subname FROM communitiessubs INNER JOIN subs ON subs.sub = communitiessubs.sub WHERE communitiessubs.disocrdchannel = @disocrdchannel').all({
                     disocrdchannel: interaction.channelID
                 })
 
