@@ -19,25 +19,28 @@ export default async(feedUrl) => {
     return {
       date: req.headers.get('date'),
       title: feed.title,
-      items: Array.isArray(feed.entry) ? feed.entry.map(formatYTEntry) : [formatYTEntry(feed.entry)]
+      items: (Array.isArray(feed.entry) ? feed.entry.map(formatYTEntry) : [formatYTEntry(feed.entry)]).filter(a=>a)
     }
   } else {
     return {
       updated: feed.updated,
       title: feed.title,
-      entry: Array.isArray(feed.entry) ? feed.entry.map(formatRdtEntry) : [formatRdtEntry(feed.entry)]
+      entry: (Array.isArray(feed.entry) ? feed.entry.map(formatRdtEntry) : [formatRdtEntry(feed.entry)]).filter(a=>a)
     }
   }
 }
 
 const formatYTEntry = (item) => {
+  const id = Array.isArray(item['yt:videoId']) ? item['yt:videoId'][0] : item['yt:videoId'];
+  
   return {
     title: item.title,
-    id: item['yt:videoId'],
+    id,
     published: item.published
   }
 }
 const formatRdtEntry = (item) => {
+  if (!item) return null;
   return {
     title: item.title,
     id: item.id,
