@@ -154,7 +154,7 @@ schedule(cronSchedule, async () => {
 	const channelList = db.prepare('SELECT * FROM ytchannels').all()
 	channelList.forEach(ch => {
 		const channelsToSend = db.prepare('SELECT * FROM channelsubs WHERE ytchannelid = @ytchannelid').all({ytchannelid: ch.channelid})
-		if (channelsToSend.length === 0) client.db.prepare('DELETE FROM ytchannels WHERE ytchannelid = @ytchannelid').run({ytchannelid: ch.channelid})
+		if (channelsToSend.length === 0) client.db.prepare('DELETE FROM ytchannels WHERE channelid = @ytchannelid').run({ytchannelid: ch.channelid})
 	})
 })
 
