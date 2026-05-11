@@ -1,4 +1,5 @@
-import { XMLParser } from "fast-xml-parser";
+// "fast-xml-parser": "^4.5.4",
+import XMLParser from "./fast-xml-parser/xmlparser/XMLParser";
 
 const parser = new XMLParser();
 
