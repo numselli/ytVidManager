@@ -20,7 +20,7 @@ export default async(feedUrl) => {
     return {
       date: req.headers.get('date'),
       title: feed.title,
-      items: (Array.isArray(feed.entry) ? feed.entry.map(formatYTEntry) : [formatYTEntry(feed.entry)]).filter(a=>a)
+      items: feed.entry ? (Array.isArray(feed.entry) ? feed.entry.map(formatYTEntry) : [formatYTEntry(feed.entry)]).filter(a=>a) : []
     }
   } else {
     return {
