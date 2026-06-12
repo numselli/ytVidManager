@@ -1,5 +1,5 @@
 // "fast-xml-parser": "^4.5.4",
-import XMLParser from "./fast-xml-parser/xmlparser/XMLParser";
+import XMLParser from "./fast-xml-parser/xmlparser/XMLParser.mjs";
 
 const parser = new XMLParser();
 let redditBlockedUntil = 0;
