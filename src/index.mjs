@@ -119,6 +119,7 @@ async function rddtSchedule() {
 	const communitiesList = db.prepare('SELECT * FROM subs').all()
 	communitiesList.forEach(async row => {
 		const rssFeed = await rssParser(`https://www.reddit.com/r/${row.sub}/new.rss`);
+		if (!rssFeed.entry) return console.log(`Error with ${row.sub}`)
 
 		const postsToAlert = rssFeed.entry.slice(0, rssFeed.entry.findIndex(a=>a.id===row.lastpost)).reverse();
 		if (postsToAlert.length === 0) return;
@@ -155,6 +156,11 @@ schedule(cronSchedule, async () => {
 	channelList.forEach(ch => {
 		const channelsToSend = db.prepare('SELECT * FROM channelsubs WHERE ytchannelid = @ytchannelid').all({ytchannelid: ch.channelid})
 		if (channelsToSend.length === 0) client.db.prepare('DELETE FROM ytchannels WHERE channelid = @ytchannelid').run({ytchannelid: ch.channelid})
+	})
+	const rddChannelList = db.prepare('SELECT * FROM subs').all()
+	rddChannelList.forEach(row => {
+		const channelsToSend = db.prepare('SELECT * FROM communitiessubs WHERE sub = @sub').all({sub: row.sub})
+		if (channelsToSend.length === 0) client.db.prepare('DELETE FROM subs WHERE sub = @sub').run({sub: row.sub})
 	})
 })
 
