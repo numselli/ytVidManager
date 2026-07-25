@@ -115,32 +115,36 @@ async function ytSchedule(){
 	});
 }
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const REDDIT_REQUEST_DELAY_MS = 3000;
+
 async function rddtSchedule() {
 	const communitiesList = db.prepare('SELECT * FROM subs').all()
-	communitiesList.forEach(async row => {
+
+	for (const [index, row] of communitiesList.entries()) {
 		const rssFeed = await rssParser(`https://www.reddit.com/r/${row.sub}/new.rss`);
-		if (!rssFeed.entry) return console.log(`Error with ${row.sub}`)
 
-		const postsToAlert = rssFeed.entry.slice(0, rssFeed.entry.findIndex(a=>a.id===row.lastpost)).reverse();
-		if (postsToAlert.length === 0) return;
+		if (rssFeed.error) {
+			console.log(rssFeed.rateLimited ? `Rate limited on r/${row.sub}, backed off ${rssFeed.retryAfter}ms` : `Error with ${row.sub}: ${rssFeed.code}`)
+		} else if (rssFeed.entry) {
+			const postsToAlert = rssFeed.entry.slice(0, rssFeed.entry.findIndex(a=>a.id===row.lastpost)).reverse();
 
-		db.prepare('UPDATE subs SET lastpost = @lastpost, lastupdated = @updated WHERE sub = @sub').run({
-			sub: row.sub,
-			lastpost: postsToAlert[postsToAlert.length-1].id,
-			updated: rssFeed.updated
-		})
+			if (postsToAlert.length > 0) {
+				db.prepare('UPDATE subs SET lastpost = @lastpost, lastupdated = @updated WHERE sub = @sub').run({sub: row.sub, lastpost: postsToAlert[postsToAlert.length-1].id, updated: rssFeed.updated})
 
-		if (rssFeed.entry.find(a => a.id===row.lastpost)){
-			const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM communitiessubs WHERE sub = @sub').all({
-				sub: row.sub
-			})
-			channelsToSend.forEach(rowCh => {
-				postsToAlert.forEach(v=>{
-					rdtPostToDiscord(rowCh.disocrdchannel, client, {pid: v.id, sub: row.sub, cid: '', userID: rowCh.owner})
-				})
-			})
+				if (rssFeed.entry.find(a => a.id===row.lastpost)){
+					const channelsToSend = db.prepare('SELECT disocrdchannel, owner FROM communitiessubs WHERE sub = @sub').all({sub: row.sub})
+					channelsToSend.forEach(rowCh => {
+						postsToAlert.forEach(v=>{
+							rdtPostToDiscord(rowCh.disocrdchannel, client, {pid: v.id, sub: row.sub, cid: '', userID: rowCh.owner})
+						})
+					})
+				}
+			}
 		}
-	})
+
+		if (index < communitiesList.length - 1) await sleep(REDDIT_REQUEST_DELAY_MS);
+	}
 }
 
 schedule(cronSchedule, async () => {

@@ -1,34 +1,54 @@
-// "fast-xml-parser": "^4.5.4",
 import XMLParser from "./fast-xml-parser/xmlparser/XMLParser.mjs";
 
 const parser = new XMLParser();
+
 let redditBlockedUntil = 0;
+const REDDIT_USER_AGENT = 'discord:ytVidManager:1.0.0 (by /u/ytVidManager)';
 const isRedditFeed = (url) => url.includes('reddit.com')
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-export default async (feedUrl) => {
-  const now = Date.now();
+const getRetryAfterMs = (headers) => {
+  const raw = headers.get('retry-after') ?? headers.get('x-ratelimit-reset');
+  const seconds = Number(raw);
+  if (!raw || Number.isNaN(seconds) || seconds <= 0) return 60_000;
+  return seconds * 1000;
+}
 
-  if (isRedditFeed(feedUrl) && now < redditBlockedUntil) return {
-    error: true,
-    code: 429,
-    retryAfter: (redditBlockedUntil - now),
-    rateLimited: true
-  };
+export default async (feedUrl, { waitOutRateLimit = true } = {}) => {
+  const isReddit = isRedditFeed(feedUrl);
 
-  const req = await fetch(feedUrl, {
-    headers: {
-      'User-Agent': 'rss-parser',
-      'Accept': 'application/rss+xml',
+  if (isReddit) {
+    const now = Date.now();
+    if (now < redditBlockedUntil) {
+      if (!waitOutRateLimit) return {
+        error: true,
+        code: 429,
+        retryAfter: (redditBlockedUntil - now),
+        rateLimited: true
+      };
+      await sleep(redditBlockedUntil - now);
     }
-  })
+  }
 
-  if (isRedditFeed(feedUrl) && req.status === 429) {
-    const retryAfterHeader = req.headers.get('x-ratelimit-reset');
-    redditBlockedUntil = now + Number(retryAfterHeader);
+  let req;
+  try {
+    req = await fetch(feedUrl, {
+      headers: {
+        'User-Agent': isReddit ? REDDIT_USER_AGENT : 'rss-parser',
+        'Accept': 'application/rss+xml',
+      }
+    })
+  } catch (error) {
+    return { error: true, code: 'FETCH_FAILED', message: error.message }
+  }
+
+  if (isReddit && req.status === 429) {
+    const retryAfterMs = getRetryAfterMs(req.headers);
+    redditBlockedUntil = Date.now() + retryAfterMs;
     return {
       error: true,
       code: 429,
-      retryAfter: retryAfterHeader,
+      retryAfter: retryAfterMs,
       rateLimited: true
     }
   }
